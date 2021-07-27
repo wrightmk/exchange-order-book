@@ -1,4 +1,5 @@
 import { expose, wrap } from "comlink";
+import { time } from "console";
 import {
   CHANGE_TICK_SIZE,
   KILL_FEED,
@@ -22,6 +23,11 @@ const test2 = async () => {
 
 test2();
 
+// Remaining things todo:
+// TODO: add totalbids , totalAsks
+// TODO: send data back to front end
+// TOOD: build UI
+
 class WebSocketStream {
   private ws: WebSocket;
   private ticker: string | undefined;
@@ -31,6 +37,8 @@ class WebSocketStream {
   private tickSize: number;
   private decimalPrecision: number;
   private normalizedOrderBook: OrderBook;
+  private lastTimeStamp: number;
+  private throttleAmount: number;
 
   constructor(ticker = "PI_XBTUSD", tickSize = 0.5) {
     this.normalizedOrderBook = {
@@ -40,12 +48,16 @@ class WebSocketStream {
       product_id: "",
       feed: "",
       tickSize: undefined,
+      lastTimeStamp: 0,
     };
 
     this.orderBook = this.normalizedOrderBook;
     this.modifiedOrderBook = this.normalizedOrderBook;
     this.ticker = ticker;
     this.tickSize = tickSize;
+    const unixTimeStamp = Date.now();
+    this.lastTimeStamp = unixTimeStamp;
+    this.throttleAmount = 3000;
 
     this.decimalPrecision = countDecimals(this.tickSize);
 
@@ -65,10 +77,10 @@ class WebSocketStream {
       };
       this.ws.onmessage = (event) => {
         const parsedData: OrderStream = JSON.parse(event.data);
-        console.log("Stream:", parsedData);
+        // console.log("Stream:", parsedData);
         switch (parsedData.feed) {
           case "book_ui_1_snapshot":
-            this.initializeOrderBook(parsedData, this.tickSize);
+            this.initializeOrderBook(parsedData, this.tickSize); //TODO: remove instance variables as arguments
             break;
           case "book_ui_1":
             this.uppdateOrderBook(parsedData, this.tickSize);
@@ -123,7 +135,7 @@ class WebSocketStream {
     }
   }
 
-  public changeTickSize(ticker: string, tickSize: number) {
+  public changeTickSize(tickSize: number) {
     this.tickSize = tickSize;
     this.decimalPrecision = countDecimals(tickSize);
     this.groupOrderBook(tickSize);
@@ -138,6 +150,7 @@ class WebSocketStream {
     this.orderBook = {
       ...parsedData,
       tickSize,
+      lastTimeStamp: this.lastTimeStamp,
       asks: this.buildOrderBook(parsedData.asks),
       bids: this.buildOrderBook(parsedData.bids),
       // totalBids might need this for the depth visualizer TODO:
@@ -171,7 +184,6 @@ class WebSocketStream {
 
   private uppdateOrderBook(parsedData: OrderStream, tickSize: number) {
     this.orderBook.feed = parsedData.feed;
-    // TODO: order totals
     const precisePrice = (price: number) =>
       Number(getFlooredFixed(price, this.decimalPrecision));
 
@@ -202,9 +214,8 @@ class WebSocketStream {
         }
       }
     }
-    // throttle every x seconds TODO: when message gets sent to the frontend
     this.groupOrderBook(tickSize);
-    // TODO: update total
+    this.updateFrontend();
   }
 
   private unsubscribe() {
@@ -223,14 +234,34 @@ class WebSocketStream {
     const bids = this.groupByTickSize(tickSize, this.orderBook.bids);
     const asks = this.groupByTickSize(tickSize, this.orderBook.asks);
 
-    // @return to frontend?? or handle this somewhere more appropriate TODO:
+    const newTimeStamp = Date.now();
+
     this.modifiedOrderBook = {
       ...this.orderBook,
       tickSize,
+      lastTimeStamp: newTimeStamp,
       asks: this.buildOrderBook(asks),
       bids: this.buildOrderBook(bids),
     };
-    console.log("this.modifiedOrderBook>>", this.modifiedOrderBook);
+  }
+
+  private updateFrontend() {
+    if (
+      this.modifiedOrderBook.lastTimeStamp >
+      this.lastTimeStamp + this.throttleAmount
+    ) {
+      const newTimeStamp = Date.now();
+
+      this.modifiedOrderBook = {
+        ...this.modifiedOrderBook,
+        lastTimeStamp: newTimeStamp,
+      };
+      this.lastTimeStamp = newTimeStamp;
+
+      // @return to frontend?? or handle this somewhere more appropriate TODO:
+
+      console.log("this.modifisedOrderBook>>", this.modifiedOrderBook);
+    }
   }
 
   private groupByTickSize(tickSize: number, orderType: Order): Array<number[]> {
@@ -287,7 +318,7 @@ const streamInterface = (payload?: WebWorkerPayload) => {
         break;
       case CHANGE_TICK_SIZE:
         if (payload.tickSize && payload.ticker) {
-          dataStream.changeTickSize(payload.ticker, payload.tickSize);
+          dataStream.changeTickSize(payload.tickSize);
         }
         break;
     }

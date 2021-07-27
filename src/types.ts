@@ -11,7 +11,7 @@ export interface OrderStream {
 }
 
 export interface Order {
-  [key: number]: { size: number, price: number, total?:number }; 
+  [key: number]: { size: number; price: number; total?: number };
 }
 
 export interface OrderBook {
@@ -20,12 +20,13 @@ export interface OrderBook {
   numLevels?: number;
   feed: string;
   product_id: string;
-  tickSize?: number
+  tickSize?: number;
+  lastTimeStamp: number;
 }
 
 export interface WebWorkerPayload {
-    type: string;
-    ticker?: string;
-    killStream?: boolean;
-    tickSize?: number
+  type: string;
+  ticker?: string;
+  killStream?: boolean;
+  tickSize?: number;
 }
