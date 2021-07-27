@@ -1,5 +1,4 @@
 import { expose, wrap } from "comlink";
-import { time } from "console";
 import {
   CHANGE_TICK_SIZE,
   KILL_FEED,
@@ -9,24 +8,6 @@ import {
   TOGGLE_FEED,
   WebWorkerPayload,
 } from "./types";
-
-function testfn() {
-  console.log("hi");
-}
-
-const test2 = async () => {
-  console.log("test2");
-  // $
-  const main: any = wrap<import("./App").MethodOnMainThread>(self as any);
-  await main.methodOnMainThread(42);
-};
-
-test2();
-
-// Remaining things todo:
-// TODO: add totalbids , totalAsks
-// TODO: send data back to front end
-// TOOD: build UI
 
 class WebSocketStream {
   private ws: WebSocket;
@@ -259,9 +240,12 @@ class WebSocketStream {
       };
       this.lastTimeStamp = newTimeStamp;
 
-      // @return to frontend?? or handle this somewhere more appropriate TODO:
-
-      console.log("this.modifisedOrderBook>>", this.modifiedOrderBook);
+      (async () => {
+        const postMessage: any = wrap<import("./App").MethodOnMainThread>(
+          self as any
+        );
+        await postMessage.methodOnMainThread(this.modifiedOrderBook);
+      })();
     }
   }
 
@@ -327,8 +311,6 @@ const streamInterface = (payload?: WebWorkerPayload) => {
 };
 
 const worker = {
-  testfn,
-  test2,
   streamInterface,
 };
 

@@ -11,14 +11,15 @@ function App() {
   const [tickSize, setTickSize] = useState(0.05);
 
   // TODO:
-//   XBT (0.5, 1, 2.5)
-//   ETH (0.05, 0.1, 0.25)
+  //   XBT (0.5, 1, 2.5)
+  //   ETH (0.05, 0.1, 0.25)
 
   const [killStream, setKillStream] = React.useState(true);
   const ticker = market === "PI_XBTUSD" ? "PI_ETHUSD" : "PI_XBTUSD";
   const worker = useRef<Worker>();
   const methodOnMainThread = (a: any) => {
-    alert(a);
+    console.log(a);
+    // alert(a);
   };
 
   const test = {
@@ -37,12 +38,12 @@ function App() {
       // worker.current.onmessage = (event) => {
       //   console.log("event from worker", event.data);
       // };
-      const { testfn, streamInterface } = wrap<import("./worker").TestWorker>(
+      const { streamInterface } = wrap<import("./worker").TestWorker>(
         worker.current as Worker
       );
       console.log(await streamInterface());
       // console.log(await streamInterface({ type: KILL_FEED }));
-      // expose(test, worker.current);
+      expose(test, worker.current);
       // setData(await testfn());
       // worker.current.terminate() TODO:
     })();
@@ -60,11 +61,11 @@ function App() {
       streamInterface({
         type: TOGGLE_FEED,
         ticker,
-        tickSize: ticker === "PI_XBTUSD" ? 0.5 : 0.05
+        tickSize: ticker === "PI_XBTUSD" ? 0.5 : 0.05,
       });
       setMarket(ticker);
     }
-  }
+  };
 
   const handleKill = () => {
     // const { streamInterface } = wrap<import("./worker").TestWorker>(
@@ -73,14 +74,14 @@ function App() {
     streamInterface({ type: KILL_FEED, ticker, killStream });
     setKillStream(!killStream);
   };
-  
-  const handleTicker = (tickSize:number) => {
+
+  const handleTicker = (tickSize: number) => {
     // const { streamInterface } = wrap<import("./worker").TestWorker>(
     //   worker.current as Worker
     // );
     streamInterface({ type: CHANGE_TICK_SIZE, tickSize, ticker });
-    setTickSize(tickSize)
-  }
+    setTickSize(tickSize);
+  };
 
   return (
     <div className="App">
