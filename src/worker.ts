@@ -38,7 +38,7 @@ class WebSocketStream {
   private decimalPrecision: number;
   private normalizedOrderBook: OrderBook;
   private lastTimeStamp: number;
-  private throttleAmount: number;
+  private timeStampDelay: number;
 
   constructor(ticker = "PI_XBTUSD", tickSize = 0.5) {
     this.normalizedOrderBook = {
@@ -49,6 +49,8 @@ class WebSocketStream {
       feed: "",
       tickSize: undefined,
       lastTimeStamp: 0,
+      asksTotal: 0,
+      bidsTotal: 0,
     };
 
     this.orderBook = this.normalizedOrderBook;
@@ -57,7 +59,7 @@ class WebSocketStream {
     this.tickSize = tickSize;
     const unixTimeStamp = Date.now();
     this.lastTimeStamp = unixTimeStamp;
-    this.throttleAmount = 3000;
+    this.timeStampDelay = 1500;
 
     this.decimalPrecision = countDecimals(this.tickSize);
 
@@ -77,13 +79,12 @@ class WebSocketStream {
       };
       this.ws.onmessage = (event) => {
         const parsedData: OrderStream = JSON.parse(event.data);
-        // console.log("Stream:", parsedData);
         switch (parsedData.feed) {
           case "book_ui_1_snapshot":
-            this.initializeOrderBook(parsedData, this.tickSize); //TODO: remove instance variables as arguments
+            this.initializeOrderBook(parsedData);
             break;
           case "book_ui_1":
-            this.uppdateOrderBook(parsedData, this.tickSize);
+            this.uppdateOrderBook(parsedData);
             break;
 
           default:
@@ -96,8 +97,6 @@ class WebSocketStream {
     };
     this.subscribe();
   }
-
-  // then group by ticks, totals etc
 
   public toggleFeed(ticker: string, tickSize: number) {
     console.log(">>>>>>>>>>>>>>>>>", ticker, tickSize, ">>>>>>>>>>>>>");
@@ -125,8 +124,6 @@ class WebSocketStream {
         console.log("+========= y12eoooossoo =========");
         this.unsubscribe();
         this.ws.close();
-        // this.orderBook = this.normalizedOrderBook;
-        // this.modifiedOrderBook = this.normalizedOrderBook;
         throw "Killed Feed";
       }
       this.subscribe();
@@ -141,26 +138,26 @@ class WebSocketStream {
     this.groupOrderBook(tickSize);
   }
 
-  private initializeOrderBook(parsedData: OrderStream, tickSize: number) {
-    // TODO: groupOrderBook here too
-    console.log(
-      "this.buildOrderBook(parsedData.asks)",
-      this.buildOrderBook(parsedData.asks)
+  private initializeOrderBook(parsedData: OrderStream) {
+    const { obj: asks, total: asksTotal } = this.buildOrderBook(
+      parsedData.asks
     );
+    const { obj: bids, total: bidsTotal } = this.buildOrderBook(
+      parsedData.bids
+    );
+
     this.orderBook = {
       ...parsedData,
-      tickSize,
+      tickSize: this.tickSize,
       lastTimeStamp: this.lastTimeStamp,
-      asks: this.buildOrderBook(parsedData.asks),
-      bids: this.buildOrderBook(parsedData.bids),
-      // totalBids might need this for the depth visualizer TODO:
-      // todalAsks
+      asks,
+      bids,
+      asksTotal,
+      bidsTotal,
     };
     this.modifiedOrderBook = this.orderBook;
-    console.log(
-      "this.modifiedOrderBook in initializeORderBook",
-      this.modifiedOrderBook
-    );
+
+    this.updateFrontend(true);
   }
 
   private buildOrderBook(orders: Array<number[]>) {
@@ -178,11 +175,10 @@ class WebSocketStream {
         total,
       };
     }
-    return obj;
-    // return {obj, total}; TODO:????
+    return { obj, total };
   }
 
-  private uppdateOrderBook(parsedData: OrderStream, tickSize: number) {
+  private uppdateOrderBook(parsedData: OrderStream) {
     this.orderBook.feed = parsedData.feed;
     const precisePrice = (price: number) =>
       Number(getFlooredFixed(price, this.decimalPrecision));
@@ -190,7 +186,6 @@ class WebSocketStream {
     if (parsedData.asks) {
       for (const data of parsedData.asks) {
         const [price, size] = data;
-
         if (size === 0) {
           delete this.orderBook.asks[precisePrice(price)];
         } else {
@@ -214,7 +209,7 @@ class WebSocketStream {
         }
       }
     }
-    this.groupOrderBook(tickSize);
+    this.groupOrderBook(this.tickSize);
     this.updateFrontend();
   }
 
@@ -231,24 +226,30 @@ class WebSocketStream {
   }
 
   private groupOrderBook(tickSize: number) {
-    const bids = this.groupByTickSize(tickSize, this.orderBook.bids);
-    const asks = this.groupByTickSize(tickSize, this.orderBook.asks);
+    const groupedBids = this.groupByTickSize(tickSize, this.orderBook.bids);
+    const groupedAsks = this.groupByTickSize(tickSize, this.orderBook.asks);
 
     const newTimeStamp = Date.now();
+
+    const { obj: asks, total: asksTotal } = this.buildOrderBook(groupedAsks);
+    const { obj: bids, total: bidsTotal } = this.buildOrderBook(groupedBids);
 
     this.modifiedOrderBook = {
       ...this.orderBook,
       tickSize,
       lastTimeStamp: newTimeStamp,
-      asks: this.buildOrderBook(asks),
-      bids: this.buildOrderBook(bids),
+      asks,
+      bids,
+      asksTotal,
+      bidsTotal,
     };
   }
 
-  private updateFrontend() {
+  private updateFrontend(byPassTimeout = false) {
     if (
+      byPassTimeout ||
       this.modifiedOrderBook.lastTimeStamp >
-      this.lastTimeStamp + this.throttleAmount
+        this.lastTimeStamp + this.timeStampDelay
     ) {
       const newTimeStamp = Date.now();
 

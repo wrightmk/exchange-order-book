@@ -22,6 +22,8 @@ export interface OrderBook {
   product_id: string;
   tickSize?: number;
   lastTimeStamp: number;
+  asksTotal: number;
+  bidsTotal: number;
 }
 
 export interface WebWorkerPayload {
