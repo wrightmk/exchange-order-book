@@ -57,13 +57,10 @@ function App() {
   );
   const handleToggle = () => {
     if (killStream) {
-
-      const test = ticker === "PI_XBTUSD" ? 0.5 : 0.05 
-      console.log(">>>>>",test, market);
       streamInterface({
         type: TOGGLE_FEED,
         ticker,
-        tickSize: test
+        tickSize: ticker === "PI_XBTUSD" ? 0.5 : 0.05
       });
       setMarket(ticker);
     }
