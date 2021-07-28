@@ -151,7 +151,7 @@ class WebSocketStream {
       if (count >= this.orderBook.numLevels) {
         /**
          * @description
-         * keep a fixed length order book to the snapshot numLevels
+         * keep a fixed length order book to match the snapshot numLevels
          */
         break;
       }
@@ -220,7 +220,11 @@ class WebSocketStream {
   }
 
   private groupOrderBook(tickSize: number) {
-    const groupedBids = this.groupByTickSize(tickSize, this.orderBook.bids);
+    const groupedBids = this.groupByTickSize(
+      tickSize,
+      this.orderBook.bids,
+      true
+    );
     const groupedAsks = this.groupByTickSize(tickSize, this.orderBook.asks);
 
     const newTimeStamp = Date.now();
@@ -262,12 +266,19 @@ class WebSocketStream {
     }
   }
 
-  private groupByTickSize(tickSize: number, orderType: Order): Array<number[]> {
+  private groupByTickSize(
+    tickSize: number,
+    orderType: Order,
+    isBidOrder = false
+  ): Array<number[]> {
     let lastPrice = 0;
     let aggregatedSize = 0;
     const resultsArr = [];
 
     const sortedOrders = Object.values(orderType).sort((a, b) => {
+      if (isBidOrder) {
+        return b.price - a.price;
+      }
       return a.price - b.price;
     });
 

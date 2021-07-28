@@ -50,7 +50,7 @@ const Bids = React.memo(({ bids, decimalPlace, bidsTotal }: Props) => {
       <tbody>
         {Object.values(bids)
           .sort((a, b) => {
-            return a.price - b.price;
+            return b.price - a.price;
           })
           .map((d) => (
             <WrapperTr key={d.price}>
