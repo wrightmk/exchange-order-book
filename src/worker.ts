@@ -82,7 +82,6 @@ class WebSocketStream {
   }
 
   public toggleFeed(ticker: string, tickSize: number) {
-    console.log(">>>>>>>>>>>>>>>>>", ticker, tickSize, ">>>>>>>>>>>>>");
     this.unsubscribe();
 
     this.tickSize = tickSize;
@@ -104,7 +103,6 @@ class WebSocketStream {
   public killFeed(killStream?: boolean) {
     try {
       if (killStream) {
-        console.log("+========= y12eoooossoo =========");
         this.unsubscribe();
         this.ws.close();
         throw "Killed Feed";
@@ -152,17 +150,17 @@ class WebSocketStream {
   private buildOrderBook(orders: Array<number[]>) {
     let total = 0;
     const obj: Order = {};
-    let count = 0;
+    // let count = 0;
     let spreadPrice = 0;
 
     for (const order of orders) {
-      if (count >= this.orderBook.numLevels) {
-        /**
-         * @description
-         * keep a fixed length order book to match the snapshot numLevels
-         */
-        break;
-      }
+      // if (count >= this.orderBook.numLevels) {
+      //   /**
+      //    * @description
+      //    * keep a fixed length order book to match the snapshot numLevels
+      //    */
+      //   break;
+      // }
       const [price, size] = order;
       const precisePrice = Number(
         getFlooredFixed(price, this.decimalPrecision)
@@ -174,7 +172,7 @@ class WebSocketStream {
         price: precisePrice,
         total,
       };
-      count++;
+      // count++;
     }
     return { obj, total, spreadPrice };
   }
@@ -193,7 +191,7 @@ class WebSocketStream {
           this.orderBook.asks[precisePrice(price)] = {
             size,
             price: precisePrice(price),
-            total: 0, //TODO:
+            total: 0,
           };
         }
       }

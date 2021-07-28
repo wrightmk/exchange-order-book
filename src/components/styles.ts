@@ -43,7 +43,7 @@ export const OrderBookContainer = styled.div`
   background-color: ${mirage};
   margin: auto;
   min-height: 56rem;
-  width: 80%;
+  /* width: 80%; */
   @media screen and (max-width: 767px) {
     width: 100%;
     min-height: 112rem;
@@ -53,9 +53,6 @@ export const OrderBookWrapper = styled.div`
   @media screen and (min-width: 768px) {
     display: flex;
   }
-  /* min-height: 56rem; */
-  /* border-top: 1px solid ${riverBed};
-  border-bottom: 1px solid ${riverBed}; */
 `;
 
 // HeaderBar.tsx
@@ -76,6 +73,7 @@ export const OrderBookH3 = styled.h3`
 
 export const HeaderColumnDiv = styled.div<{ start?: boolean; end?: boolean }>`
   flex: 1;
+  text-align: center;
   ${(props) =>
     props.start &&
     css`
@@ -92,21 +90,14 @@ export const HeaderColumnDiv = styled.div<{ start?: boolean; end?: boolean }>`
         padding-right: 2rem;
         justify-content: flex-end;
       }
-    `}
+    `};
 `;
 
 // Bids.tsx
 // Asks.tsx
-export const TableHead = styled.thead`
-  /* border-top: 1px solid ${riverBed}; */
-  /* border-bottom: 1px solid ${riverBed}; */
-`;
 export const TableHeadTr = styled.tr`
   height: 30px;
-  /* border-top: 1px solid ${riverBed}; */
-  /* border-bottom: 1px solid ${riverBed}; */
   border-bottom: 1px solid rgb(71, 78, 93, 0.3);
-
   display: flex; //Strictly for Opera
 `;
 
@@ -114,52 +105,21 @@ export const Table = styled.table`
   width: 50%;
   display: flex; //Strictly for Opera
   flex-direction: column; //Strictly for Opera
-  /* background: pink; */ /* border: 0; */
-  /* border-top: 1px solid ${riverBed}; */
-  /* border-bottom: 1px solid ${riverBed}; */ /* border-collapse: separate; */
-  /* border-spacing: 0 5px; */
   > tr {
     display: flex;
     width: 95%;
-    /* border-top: 1px solid ${riverBed};
-    border-bottom: 1px solid ${riverBed}; */
-    > th {
-      /* border-collapse: separate;
-      border-spacing: 5px 5px; */
-      /* border-top: 1px solid ${riverBed};
-      border-bottom: 1px solid ${riverBed}; */
-      /* border-bottom: 1px solid red; */
-    }
   }
-  /* table-layout: fixed; */
   @media screen and (max-width: 767px) {
     width: 100%;
   }
 `;
 
 export const Th = styled.th`
-  /* border-bottom: 1px solid rgb(71, 78, 93, 0.3); */
   width: 31.3%;
   color: ${riverBed};
   font-size: 1.5rem;
   text-align: right;
   text-transform: uppercase;
-  /* flex: 0.8; */
-  /* 
-  display: flex; */
-
-  /* width: 100%; */
-  /* 
-
-  background-color: tomato; */
-`;
-
-export const TableHeaderDiv = styled.div`
-  /* border-top: 1px solid ${riverBed};
-  border-bottom: 1px solid ${riverBed}; */
-  /* display: flex;
-  justify-content: flex-end; */
-  /* width: 100%; */
 `;
 
 const handleTdColor = (type?: string) => {
@@ -188,33 +148,15 @@ export const DataTd = styled.td<{ type?: string }>`
 `;
 
 export const DataTr = styled.tr`
-  /* height: 10px; */
   position: absolute;
   display: flex;
   flex-direction: row;
-  /* justify-content: space-between;
-  align-items: flex-start; */
   width: 95%;
   top: 0;
   left: 0;
   height: 100%;
   z-index: 1;
 `;
-
-// export const DepthVisualizerTr = styled.tr`
-//   background-color: tomato;
-//   width: 100%;
-// `;
-// export const TestTd = styled.td<{ first?: boolean }>`
-//   ${(props) =>
-//     props.first &&
-//     css`
-//       border-top: 3px solid #4d4d4d;
-//       border-collapse: separate;
-//       border-spacing: 5px 5px;
-//       width: 100%;
-//     `}
-// `;
 
 export const DepthVisualizerTd = styled.td<{
   type: string;

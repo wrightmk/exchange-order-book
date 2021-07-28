@@ -2,7 +2,6 @@ import React from "react";
 import { OrderBook } from "../types";
 import Asks from "./Asks";
 import Bids from "./Bids";
-import Button from "./Button";
 import FooterBar from "./FooterBar";
 import HeaderBar from "./HeaderBar";
 import { Default, Mobile } from "./Responsive";
@@ -73,6 +72,7 @@ export default function Orderbook({
           />
         </Mobile>
       </OrderBookWrapper>
+
       <FooterBar handleToggle={handleToggle} handleKill={handleKill} />
     </OrderBookContainer>
   );
