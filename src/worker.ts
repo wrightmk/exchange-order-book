@@ -36,16 +36,15 @@ class WebSocketStream {
       bidsLowestPrice: 0,
     };
 
+    const unixTimeStamp = Date.now();
+
     this.orderBook = this.normalizedOrderBook;
     this.modifiedOrderBook = this.normalizedOrderBook;
     this.ticker = ticker;
     this.tickSize = tickSize;
-    const unixTimeStamp = Date.now();
     this.lastTimeStamp = unixTimeStamp;
     this.timeStampDelay = 1500;
-
     this.decimalPrecision = countDecimals(this.tickSize);
-
     this.ws = new WebSocket("wss://www.cryptofacilities.com/ws/v1");
 
     this.subscribe = () => {
@@ -73,6 +72,9 @@ class WebSocketStream {
           default:
             break;
         }
+      };
+      this.ws.onerror = () => {
+        this.ws.close();
       };
       this.ws.onclose = () => {
         this.ws.close();
