@@ -7,7 +7,7 @@ export interface OrderStream {
   asks: Array<number[]>;
   bids: Array<number[]>;
   feed: string;
-  numLevels: number;
+  numLevels?: number;
   product_id: string;
 }
 export interface Order {
@@ -16,7 +16,7 @@ export interface Order {
 export interface OrderBook {
   asks: Order;
   bids: Order;
-  numLevels: number;
+  numLevels?: number;
   feed: string;
   product_id: string;
   tickSize?: number;

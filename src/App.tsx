@@ -68,16 +68,14 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <Orderbook
-        handleToggle={handleToggle}
-        handleKill={handleKill}
-        handleTicker={handleTicker}
-        tickSize={tickSize}
-        market={market}
-        data={data}
-      />
-    </div>
+    <Orderbook
+      handleToggle={handleToggle}
+      handleKill={handleKill}
+      handleTicker={handleTicker}
+      tickSize={tickSize}
+      market={market}
+      data={data}
+    />
   );
 }
 export type MethodOnMainThread = typeof test;

@@ -9,7 +9,7 @@ import {
   WebWorkerPayload,
 } from "./types";
 
-class WebSocketStream {
+export class WebSocketStream {
   private ws: WebSocket;
   private ticker: string | undefined;
   private orderBook: OrderBook;
@@ -67,6 +67,7 @@ class WebSocketStream {
             break;
           case "book_ui_1":
             this.uppdateOrderBook(parsedData);
+            this.updateFrontend();
             break;
 
           default:
@@ -135,6 +136,7 @@ class WebSocketStream {
 
     this.orderBook = {
       ...parsedData,
+      numLevels: parsedData.numLevels || undefined,
       tickSize: this.tickSize,
       lastTimeStamp: this.lastTimeStamp,
       asks,
@@ -213,7 +215,6 @@ class WebSocketStream {
       }
     }
     this.groupOrderBook(this.tickSize);
-    this.updateFrontend();
   }
 
   private unsubscribe() {
@@ -285,7 +286,7 @@ class WebSocketStream {
     }
   }
 
-  private groupByTickSize(
+  public groupByTickSize(
     tickSize: number,
     orderType: Order,
     isBidOrder = false
@@ -310,28 +311,32 @@ class WebSocketStream {
         resultsArr.push([lastPrice, aggregatedSize]);
         aggregatedSize = size;
       }
+
       lastPrice = roundedDownPrice;
     }
+
+    resultsArr.push([lastPrice, aggregatedSize]);
+
     return resultsArr;
   }
 }
 
 // Utilitiy functions
 
-const getFlooredFixed = (value: number, decimal: number) => {
+export const getFlooredFixed = (value: number, decimal: number) => {
   return (
     Math.floor(value * Math.pow(10, decimal)) / Math.pow(10, decimal)
   ).toFixed(decimal);
 };
 
-const countDecimals = (value: number): number => {
+export const countDecimals = (value: number): number => {
   if (Math.floor(value.valueOf()) === value.valueOf()) return 0;
   return value.toString().split(".")[1].length || 0;
 };
 
 //
 
-const dataStream = new WebSocketStream();
+export const dataStream = new WebSocketStream();
 
 const streamInterface = (payload?: WebWorkerPayload) => {
   if (payload) {
