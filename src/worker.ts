@@ -25,7 +25,7 @@ class WebSocketStream {
     this.normalizedOrderBook = {
       bids: [],
       asks: [],
-      numLevels: undefined,
+      numLevels: 0,
       product_id: "",
       feed: "",
       tickSize: undefined,
@@ -141,10 +141,20 @@ class WebSocketStream {
     this.updateFrontend(true);
   }
 
+  //Bug TODO: highest bid should have lowest total
   private buildOrderBook(orders: Array<number[]>) {
     let total = 0;
     const obj: Order = {};
+    let count = 0;
+
     for (const order of orders) {
+      if (count >= this.orderBook.numLevels) {
+        /**
+         * @description
+         * keep a fixed length order book to the snapshot numLevels
+         */
+        break;
+      }
       const [price, size] = order;
       const precisePrice = Number(
         getFlooredFixed(price, this.decimalPrecision)
@@ -155,6 +165,7 @@ class WebSocketStream {
         price: precisePrice,
         total,
       };
+      count++;
     }
     return { obj, total };
   }
@@ -173,6 +184,7 @@ class WebSocketStream {
           this.orderBook.asks[precisePrice(price)] = {
             size,
             price: precisePrice(price),
+            total: 0, //TODO:
           };
         }
       }
@@ -186,6 +198,7 @@ class WebSocketStream {
           this.orderBook.bids[precisePrice(price)] = {
             size,
             price: precisePrice(price),
+            total: 0,
           };
         }
       }
@@ -310,10 +323,8 @@ const streamInterface = (payload?: WebWorkerPayload) => {
   }
 };
 
-const worker = {
+export const worker = {
   streamInterface,
 };
-
-export type TestWorker = typeof worker;
 
 expose(worker);

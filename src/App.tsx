@@ -3,22 +3,39 @@ import logo from "./logo.svg";
 import "./App.css";
 import { expose, wrap } from "comlink";
 import Worker from "worker-loader!./worker";
-import { CHANGE_TICK_SIZE, KILL_FEED, TOGGLE_FEED } from "./types";
+import {
+  CHANGE_TICK_SIZE,
+  KILL_FEED,
+  Order,
+  OrderBook,
+  TOGGLE_FEED,
+} from "./types";
+import Button from "./components/Button";
+import Dropdown from "./components/Dropdown";
+import Orderbook from "./components/Orderbook";
 
 function App() {
-  const [data, setData] = React.useState("");
+  const [data, setData] = React.useState({
+    bids: [],
+    asks: [],
+    numLevels: 0,
+    product_id: "",
+    feed: "",
+    tickSize: undefined,
+    lastTimeStamp: 0,
+    asksTotal: 0,
+    bidsTotal: 0,
+  });
   const [market, setMarket] = useState("PI_XBTUSD");
   const [tickSize, setTickSize] = useState(0.05);
-
-  // TODO:
-  //   XBT (0.5, 1, 2.5)
-  //   ETH (0.05, 0.1, 0.25)
 
   const [killStream, setKillStream] = React.useState(true);
   const ticker = market === "PI_XBTUSD" ? "PI_ETHUSD" : "PI_XBTUSD";
   const worker = useRef<Worker>();
-  const methodOnMainThread = (a: any) => {
-    console.log(a);
+  const methodOnMainThread = (orderBook: any) => {
+    // console.log(a);
+    // setData(orderBook);
+    setData(Object.freeze(orderBook)); //Freeze orderbook? issue with duplicate book being created
     // alert(a);
   };
 
@@ -28,7 +45,7 @@ function App() {
 
   useEffect(() => {
     (async () => {
-      setData("loading");
+      // setData("loading");
       worker.current = new Worker();
       // const worker = new Worker("./worker", {
       //   name: "randomname",
@@ -38,7 +55,7 @@ function App() {
       // worker.current.onmessage = (event) => {
       //   console.log("event from worker", event.data);
       // };
-      const { streamInterface } = wrap<import("./worker").TestWorker>(
+      const { streamInterface } = wrap<import("./types").WebWorker>(
         worker.current as Worker
       );
       console.log(await streamInterface());
@@ -53,7 +70,7 @@ function App() {
   //   setData("loaded");
   // }
 
-  const { streamInterface } = wrap<import("./worker").TestWorker>(
+  const { streamInterface } = wrap<import("./types").WebWorker>(
     worker.current as Worker
   );
   const handleToggle = () => {
@@ -68,7 +85,7 @@ function App() {
   };
 
   const handleKill = () => {
-    // const { streamInterface } = wrap<import("./worker").TestWorker>(
+    // const { streamInterface } = wrap<import("./worker").WebWorker>(
     //   worker.current as Worker
     // );
     streamInterface({ type: KILL_FEED, ticker, killStream });
@@ -76,7 +93,7 @@ function App() {
   };
 
   const handleTicker = (tickSize: number) => {
-    // const { streamInterface } = wrap<import("./worker").TestWorker>(
+    // const { streamInterface } = wrap<import("./worker").WebWorker>(
     //   worker.current as Worker
     // );
     streamInterface({ type: CHANGE_TICK_SIZE, tickSize, ticker });
@@ -85,12 +102,10 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
+      {/* <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         {console.log("DATA:", data)}
-        <button onClick={handleToggle}>Toggle</button>
 
-        <button onClick={handleKill}>kill stream</button>
         <button onClick={() => handleTicker(0.5)}>0.5 XBT</button>
         <button onClick={() => handleTicker(1.0)}>1.0 XBT</button>
         <button onClick={() => handleTicker(2.5)}>2.5 XBT</button>
@@ -110,7 +125,15 @@ function App() {
         >
           Learn React
         </a>
-      </header>
+      </header> */}
+      <Orderbook
+        handleToggle={handleToggle}
+        handleKill={handleKill}
+        handleTicker={handleTicker}
+        tickSize={tickSize}
+        market={market}
+        data={data}
+      />
     </div>
   );
 }
