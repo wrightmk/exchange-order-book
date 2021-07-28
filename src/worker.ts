@@ -32,6 +32,8 @@ class WebSocketStream {
       lastTimeStamp: 0,
       asksTotal: 0,
       bidsTotal: 0,
+      asksLowestPrice: 0,
+      bidsLowestPrice: 0,
     };
 
     this.orderBook = this.normalizedOrderBook;
@@ -120,12 +122,16 @@ class WebSocketStream {
   }
 
   private initializeOrderBook(parsedData: OrderStream) {
-    const { obj: asks, total: asksTotal } = this.buildOrderBook(
-      parsedData.asks
-    );
-    const { obj: bids, total: bidsTotal } = this.buildOrderBook(
-      parsedData.bids
-    );
+    const {
+      obj: asks,
+      total: asksTotal,
+      spreadPrice: asksLowestPrice,
+    } = this.buildOrderBook(parsedData.asks);
+    const {
+      obj: bids,
+      total: bidsTotal,
+      spreadPrice: bidsLowestPrice,
+    } = this.buildOrderBook(parsedData.bids);
 
     this.orderBook = {
       ...parsedData,
@@ -135,17 +141,19 @@ class WebSocketStream {
       bids,
       asksTotal,
       bidsTotal,
+      asksLowestPrice,
+      bidsLowestPrice,
     };
     this.modifiedOrderBook = this.orderBook;
 
     this.updateFrontend(true);
   }
 
-  //Bug TODO: highest bid should have lowest total
   private buildOrderBook(orders: Array<number[]>) {
     let total = 0;
     const obj: Order = {};
     let count = 0;
+    let spreadPrice = 0;
 
     for (const order of orders) {
       if (count >= this.orderBook.numLevels) {
@@ -159,6 +167,7 @@ class WebSocketStream {
       const precisePrice = Number(
         getFlooredFixed(price, this.decimalPrecision)
       );
+      if (!spreadPrice) spreadPrice = price;
       total += size;
       obj[precisePrice] = {
         size,
@@ -167,7 +176,7 @@ class WebSocketStream {
       };
       count++;
     }
-    return { obj, total };
+    return { obj, total, spreadPrice };
   }
 
   private uppdateOrderBook(parsedData: OrderStream) {
@@ -229,8 +238,16 @@ class WebSocketStream {
 
     const newTimeStamp = Date.now();
 
-    const { obj: asks, total: asksTotal } = this.buildOrderBook(groupedAsks);
-    const { obj: bids, total: bidsTotal } = this.buildOrderBook(groupedBids);
+    const {
+      obj: asks,
+      total: asksTotal,
+      spreadPrice: asksLowestPrice,
+    } = this.buildOrderBook(groupedAsks);
+    const {
+      obj: bids,
+      total: bidsTotal,
+      spreadPrice: bidsLowestPrice,
+    } = this.buildOrderBook(groupedBids);
 
     this.modifiedOrderBook = {
       ...this.orderBook,
@@ -240,6 +257,8 @@ class WebSocketStream {
       bids,
       asksTotal,
       bidsTotal,
+      asksLowestPrice,
+      bidsLowestPrice,
     };
   }
 

@@ -36,6 +36,8 @@ export default function Orderbook({
         handleTicker={handleTicker}
         tickSize={tickSize}
         market={market}
+        asksLowestPrice={data.asksLowestPrice}
+        bidsLowestPrice={data.bidsLowestPrice}
       />
       <OrderBookWrapper>
         {/* <Book data={data}> */}

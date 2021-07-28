@@ -25,6 +25,8 @@ function App() {
     lastTimeStamp: 0,
     asksTotal: 0,
     bidsTotal: 0,
+    bidsLowestPrice: 0,
+    asksLowestPrice: 0,
   });
   const [market, setMarket] = useState("PI_XBTUSD");
   const [tickSize, setTickSize] = useState(0.05);

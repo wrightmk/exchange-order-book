@@ -27,6 +27,8 @@ export interface OrderBook {
   lastTimeStamp: number;
   asksTotal: number;
   bidsTotal: number;
+  asksLowestPrice: number;
+  bidsLowestPrice: number;
 }
 
 export interface WebWorkerPayload {
