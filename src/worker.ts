@@ -154,17 +154,17 @@ export class WebSocketStream {
   private buildOrderBook(orders: Array<number[]>) {
     let total = 0;
     const obj: Order = {};
-    // let count = 0;
+    let count = 0;
     let spreadPrice = 0;
 
     for (const order of orders) {
-      // if (count >= this.orderBook.numLevels) {
-      //   /**
-      //    * @description
-      //    * keep a fixed length order book to match the snapshot numLevels
-      //    */
-      //   break;
-      // }
+      if (count >= Number(this.orderBook.numLevels)) {
+        /**
+         * @description
+         * keep a fixed length order book to match the snapshot numLevels
+         */
+        break;
+      }
       const [price, size] = order;
       const precisePrice = Number(
         getFlooredFixed(price, this.decimalPrecision)
@@ -176,7 +176,7 @@ export class WebSocketStream {
         price: precisePrice,
         total,
       };
-      // count++;
+      count++;
     }
     return { obj, total, spreadPrice };
   }
