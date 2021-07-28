@@ -104,17 +104,19 @@ export const TableHead = styled.thead`
 export const TableHeadTr = styled.tr`
   height: 30px;
   /* border-top: 1px solid ${riverBed}; */
-  border-bottom: 1px solid ${riverBed};
+  /* border-bottom: 1px solid ${riverBed}; */
+  border-bottom: 1px solid rgb(71, 78, 93, 0.3);
+
+  display: flex; //Strictly for Opera
 `;
 
 export const Table = styled.table`
   width: 50%;
-
-  /* background: pink; */
-  /* border: 0; */
+  display: flex; //Strictly for Opera
+  flex-direction: column; //Strictly for Opera
+  /* background: pink; */ /* border: 0; */
   /* border-top: 1px solid ${riverBed}; */
-  /* border-bottom: 1px solid ${riverBed}; */
-  /* border-collapse: separate; */
+  /* border-bottom: 1px solid ${riverBed}; */ /* border-collapse: separate; */
   /* border-spacing: 0 5px; */
   > tr {
     display: flex;
@@ -136,8 +138,8 @@ export const Table = styled.table`
 `;
 
 export const Th = styled.th`
-  border-bottom: 1px solid rgb(71, 78, 93, 0.3);
-
+  /* border-bottom: 1px solid rgb(71, 78, 93, 0.3); */
+  width: 31.3%;
   color: ${riverBed};
   font-size: 1.5rem;
   text-align: right;
@@ -174,6 +176,7 @@ const handleTdColor = (type?: string) => {
 export const WrapperTr = styled.tr`
   position: relative;
   height: 25px;
+  display: flex; //Strictly for Opera
 `;
 
 export const DataTd = styled.td<{ type?: string }>`
@@ -189,6 +192,8 @@ export const DataTr = styled.tr`
   position: absolute;
   display: flex;
   flex-direction: row;
+  /* justify-content: space-between;
+  align-items: flex-start; */
   width: 95%;
   top: 0;
   left: 0;

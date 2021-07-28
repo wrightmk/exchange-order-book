@@ -27,14 +27,13 @@ const Bids = React.memo(({ bids, decimalPlace, highestTotalInBook }: Props) => {
       .map((d) => (
         <WrapperTr key={d.price}>
           <tr>
-            {/* <TestTd first={i === 0} /> */}
             <DepthVisualizerTd
               type="bids"
               isMobile={isMobile}
               /**
-           * @description
-           passing this magnitude of change to js-in-css (styled components) breaks the UI, inline style fixes it
-           */
+               * @description
+               passing this magnitude of change to js-in-css (styled components) breaks the UI, inline style fixes it
+              */
               style={{ width: `${(d.total / highestTotalInBook) * 100}%` }}
             />
           </tr>
@@ -61,9 +60,9 @@ const Bids = React.memo(({ bids, decimalPlace, highestTotalInBook }: Props) => {
       <Default>
         <thead>
           <TableHeadTr>
-            <Th style={{ width: "32%" }}>Total</Th>
-            <Th style={{ width: "32%" }}>Size</Th>
-            <Th style={{ paddingRight: "5%" }}>Price</Th>
+            <Th>Total</Th>
+            <Th>Size</Th>
+            <Th>Price</Th>
           </TableHeadTr>
         </thead>
       </Default>

@@ -31,11 +31,11 @@ const Asks = React.memo(({ asks, decimalPlace, highestTotalInBook }: Props) => {
           <tr>
             <DepthVisualizerTd
               type="asks"
-              /**
-             * @description
-             passing this magnitude of change to js-in-css (styled components) breaks the UI, inline style fixes it
-             */
               style={{ width: `${(d.total / highestTotalInBook) * 100}%` }}
+              /**
+               * @description
+               passing this magnitude of change to js-in-css (styled components) breaks the UI, inline style fixes it
+              */
             />
           </tr>
           <DataTr>
@@ -52,9 +52,9 @@ const Asks = React.memo(({ asks, decimalPlace, highestTotalInBook }: Props) => {
     <Table>
       <thead>
         <TableHeadTr>
-          <Th style={{ width: "32%" }}>Price</Th>
-          <Th style={{ width: "32%" }}>Size</Th>
-          <Th style={{ paddingRight: "5%" }}>Total</Th>
+          <Th>Price</Th>
+          <Th>Size</Th>
+          <Th>Total</Th>
         </TableHeadTr>
       </thead>
       <tbody>
