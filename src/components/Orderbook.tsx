@@ -6,7 +6,7 @@ import FooterBar from "./FooterBar";
 import HeaderBar from "./HeaderBar";
 import { Default, Mobile } from "./Responsive";
 import Spread from "./Spread";
-import { OrderBookContainer, OrderBookWrapper } from "./styles";
+import { Loading, OrderBookContainer, OrderBookWrapper } from "./styles";
 
 interface Props {
   market: string;
@@ -30,24 +30,32 @@ export default function Orderbook({
   }
   const decimalPlace = !isInt(data.tickSize || 0) ? 2 : 0;
   const highestTotalInBook = Math.max(data.asksTotal, data.bidsTotal);
-
+  const hasLoaded =
+    Object.keys(data.bids).length > 0 && Object.keys(data.asks).length > 0;
+  if (!hasLoaded) {
+    return <Loading>Loading...</Loading>;
+  }
   return (
     <OrderBookContainer>
-      <HeaderBar
-        handleTicker={handleTicker}
-        tickSize={tickSize}
-        market={market}
-        asksLowestPrice={data.asksLowestPrice}
-        bidsLowestPrice={data.bidsLowestPrice}
-      />
+      {hasLoaded && (
+        <HeaderBar
+          handleTicker={handleTicker}
+          tickSize={tickSize}
+          market={market}
+          asksLowestPrice={data.asksLowestPrice}
+          bidsLowestPrice={data.bidsLowestPrice}
+        />
+      )}
       <OrderBookWrapper>
         <Default>
           <Bids
+            hasLoaded={hasLoaded}
             bids={data.bids}
             decimalPlace={decimalPlace}
             highestTotalInBook={highestTotalInBook}
           />
           <Asks
+            hasLoaded={hasLoaded}
             asks={data.asks}
             decimalPlace={decimalPlace}
             highestTotalInBook={highestTotalInBook}
@@ -55,6 +63,7 @@ export default function Orderbook({
         </Default>
         <Mobile>
           <Asks
+            hasLoaded={hasLoaded}
             asks={data.asks}
             decimalPlace={decimalPlace}
             highestTotalInBook={highestTotalInBook}
@@ -66,6 +75,7 @@ export default function Orderbook({
             />
           </Mobile>
           <Bids
+            hasLoaded={hasLoaded}
             bids={data.bids}
             decimalPlace={decimalPlace}
             highestTotalInBook={highestTotalInBook}
@@ -73,7 +83,9 @@ export default function Orderbook({
         </Mobile>
       </OrderBookWrapper>
 
-      <FooterBar handleToggle={handleToggle} handleKill={handleKill} />
+      {hasLoaded && (
+        <FooterBar handleToggle={handleToggle} handleKill={handleKill} />
+      )}
     </OrderBookContainer>
   );
 }

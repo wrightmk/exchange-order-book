@@ -171,7 +171,6 @@ export const DepthVisualizerTd = styled.td<{
   isMobile?: boolean;
 }>`
   will-change: width;
-
   min-height: 100%;
   background-color: ${(props) =>
     props.type === "bids" ? deepTeal : cocoaBean};
@@ -200,4 +199,8 @@ export const FooterBarWrapperButtonWrapper = styled.div<{ right?: boolean }>`
     css`
       margin-left: 1rem;
     `};
+`;
+
+export const Loading = styled.h1`
+  color: ${ghost};
 `;
