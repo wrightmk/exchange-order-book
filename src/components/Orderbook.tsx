@@ -31,7 +31,7 @@ export default function Orderbook({
   const decimalPlace = !isInt(data.tickSize || 0) ? 2 : 0;
   const highestTotalInBook = Math.max(data.asksTotal, data.bidsTotal);
   const hasLoaded =
-    Object.keys(data.bids).length > 0 && Object.keys(data.asks).length > 0;
+    Object.keys(data.bids).length > 1 && Object.keys(data.asks).length > 1;
   if (!hasLoaded) {
     return <Loading>Loading...</Loading>;
   }
