@@ -14,10 +14,10 @@ import {
 interface Props {
   asks: Order;
   decimalPlace: number;
-  asksTotal: number;
+  highestTotalInBook: number;
 }
 
-const Asks = React.memo(({ asks, decimalPlace, asksTotal }: Props) => {
+const Asks = React.memo(({ asks, decimalPlace, highestTotalInBook }: Props) => {
   const renderTbody = (isMobile?: boolean) =>
     Object.values(asks)
       .sort((a, b) => {
@@ -35,7 +35,7 @@ const Asks = React.memo(({ asks, decimalPlace, asksTotal }: Props) => {
              * @description
              passing this magnitude of change to js-in-css (styled components) breaks the UI, inline style fixes it
              */
-              style={{ width: `${(d.total / asksTotal) * 100}%` }}
+              style={{ width: `${(d.total / highestTotalInBook) * 100}%` }}
             />
           </tr>
           <DataTr>

@@ -30,7 +30,8 @@ export default function Orderbook({
     return n % 1 === 0;
   }
   const decimalPlace = !isInt(data.tickSize || 0) ? 2 : 0;
-  // TODO calculate spread for headerbar
+  const highestTotalInBook = Math.max(data.asksTotal, data.bidsTotal);
+
   return (
     <OrderBookContainer>
       <HeaderBar
@@ -45,19 +46,19 @@ export default function Orderbook({
           <Bids
             bids={data.bids}
             decimalPlace={decimalPlace}
-            bidsTotal={data.bidsTotal}
+            highestTotalInBook={highestTotalInBook}
           />
           <Asks
             asks={data.asks}
             decimalPlace={decimalPlace}
-            asksTotal={data.asksTotal}
+            highestTotalInBook={highestTotalInBook}
           />
         </Default>
         <Mobile>
           <Asks
             asks={data.asks}
             decimalPlace={decimalPlace}
-            asksTotal={data.asksTotal}
+            highestTotalInBook={highestTotalInBook}
           />
           <Mobile>
             <Spread
@@ -68,7 +69,7 @@ export default function Orderbook({
           <Bids
             bids={data.bids}
             decimalPlace={decimalPlace}
-            bidsTotal={data.bidsTotal}
+            highestTotalInBook={highestTotalInBook}
           />
         </Mobile>
       </OrderBookWrapper>
