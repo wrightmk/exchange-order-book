@@ -31,11 +31,18 @@ export const ButtonWrapper = styled.button<{ toggleFeed?: boolean }>`
 export const DropdownSelect = styled.select`
   background-color: ${oxfordBlue};
   height: 4rem;
-  width: 12rem;
+  width: 13rem;
   border-radius: 0.75rem;
   color: ${ghost};
   font-size: 1.8rem;
   cursor: pointer;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+  background-repeat: no-repeat;
+  background-position-x: 100%;
+  background-position-y: 0.8rem;
+  padding: 1rem;
+  -moz-appearance: none;
+  -webkit-appearance: none;
 `;
 
 // Orderbook.tsx
