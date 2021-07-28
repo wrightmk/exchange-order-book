@@ -1,10 +1,11 @@
 import React from "react";
 import Dropdown from "./Dropdown";
+import { Default } from "./Responsive";
+import Spread from "./Spread";
 import {
   HeaderBarWrapper,
   HeaderColumnDiv,
   OrderBookH2,
-  OrderBookH3,
 } from "./styles";
 
 interface Props {
@@ -14,7 +15,6 @@ interface Props {
   asksLowestPrice: number;
   bidsLowestPrice: number;
 }
-// TODO: fix border bottom
 export default function DisplayBar({
   tickSize,
   market,
@@ -29,21 +29,18 @@ export default function DisplayBar({
       return [0.05, 0.1, 0.25];
     }
   };
-  const spread = Math.abs(asksLowestPrice - bidsLowestPrice).toFixed(1);
-  const percentSpread = (
-    (Number(spread) / (bidsLowestPrice + asksLowestPrice / 2)) *
-    100
-  ).toFixed(2);
+
   return (
     <HeaderBarWrapper>
       <HeaderColumnDiv start>
         <OrderBookH2>Order Book</OrderBookH2>
       </HeaderColumnDiv>
-      <HeaderColumnDiv>
-        <OrderBookH3>
-          Spread: {spread} ({percentSpread}%)
-        </OrderBookH3>
-      </HeaderColumnDiv>
+      <Default>
+        <Spread
+          asksLowestPrice={asksLowestPrice}
+          bidsLowestPrice={bidsLowestPrice}
+        />
+      </Default>
       <HeaderColumnDiv end>
         <Dropdown
           onChange={handleTicker}

@@ -1,13 +1,15 @@
-import React, { Profiler } from "react";
+import React from "react";
 import { Order } from "../types";
+import { Default, Mobile } from "./Responsive";
 import {
-  BookTable,
-  BookTh,
+  Table,
+  Th,
   DataTd,
   DataTr,
   DepthVisualizerTd,
-  TableHeaderDiv,
   WrapperTr,
+  TableHeadTr,
+  // TestTd,
 } from "./styles";
 
 interface Props {
@@ -17,64 +19,59 @@ interface Props {
 }
 
 const Bids = React.memo(({ bids, decimalPlace, bidsTotal }: Props) => {
-  const onRenderCallback = (
-    id: any, // the "id" prop of the Profiler tree that has just committed
-    phase: any, // either "mount" (if the tree just mounted) or "update" (if it re-rendered)
-    actualDuration: any, // time spent rendering the committed update
-    baseDuration: any, // estimated time to render the entire subtree without memoization
-    startTime: any, // when React began rendering this update
-    commitTime: any, // when React committed this update
-    interactions: any // the Set of interactions belonging to this update
-  ) => {
-    console.log({
-      id,
-      phase,
-      actualDuration,
-      baseDuration,
-      startTime,
-      commitTime,
-      interactions,
-    });
-  };
+  const renderTbody = (isMobile?: boolean) =>
+    Object.values(bids)
+      .sort((a, b) => {
+        return b.price - a.price;
+      })
+      .map((d) => (
+        <WrapperTr key={d.price}>
+          <tr>
+            {/* <TestTd first={i === 0} /> */}
+            <DepthVisualizerTd
+              type="bids"
+              isMobile={isMobile}
+              /**
+           * @description
+           passing this magnitude of change to js-in-css (styled components) breaks the UI, inline style fixes it
+           */
+              style={{ width: `${(d.total / bidsTotal) * 100}%` }}
+            />
+          </tr>
+          <DataTr>
+            <Default>
+              <DataTd>{d?.total.toLocaleString()}</DataTd>
+              <DataTd>{d?.size.toLocaleString()}</DataTd>
+              <DataTd type="bids">
+                {d?.price.toFixed(decimalPlace).toLocaleString()}
+              </DataTd>
+            </Default>
+            <Mobile>
+              <DataTd type="bids">
+                {d?.price.toFixed(decimalPlace).toLocaleString()}
+              </DataTd>
+              <DataTd>{d?.size.toLocaleString()}</DataTd>
+              <DataTd>{d?.total.toLocaleString()}</DataTd>
+            </Mobile>
+          </DataTr>
+        </WrapperTr>
+      ));
   return (
-    <BookTable>
-      {/* <TableHeaderDiv> */}
-      <thead>
-        <tr>
-          <BookTh>Total</BookTh>
-          <BookTh>Size</BookTh>
-          <BookTh>Price</BookTh>
-        </tr>
-      </thead>
-      {/* </TableHeaderDiv> */}
+    <Table>
+      <Default>
+        <thead>
+          <TableHeadTr>
+            <Th style={{ width: "32%" }}>Total</Th>
+            <Th style={{ width: "32%" }}>Size</Th>
+            <Th style={{ paddingRight: "5%" }}>Price</Th>
+          </TableHeadTr>
+        </thead>
+      </Default>
       <tbody>
-        {Object.values(bids)
-          .sort((a, b) => {
-            return b.price - a.price;
-          })
-          .map((d) => (
-            <WrapperTr key={d.price}>
-              <tr>
-                <DepthVisualizerTd
-                  type="bids"
-                  /**
-                   * @description
-                   passing this magnitude of change to js-in-css (styled components) breaks the UI, inline style fixes it
-                   */
-                  style={{ width: `${(d.total / bidsTotal) * 100}%` }}
-                />
-              </tr>
-              <DataTr>
-                <DataTd>{d?.total.toLocaleString()}</DataTd>
-                <DataTd>{d?.size.toLocaleString()}</DataTd>
-                <DataTd type="bids">
-                  {d?.price.toFixed(decimalPlace).toLocaleString()}
-                </DataTd>
-              </DataTr>
-            </WrapperTr>
-          ))}
+        <Default>{renderTbody()}</Default>
+        <Mobile>{renderTbody(true)}</Mobile>
       </tbody>
-    </BookTable>
+    </Table>
   );
 });
 

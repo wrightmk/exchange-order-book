@@ -2,10 +2,11 @@ import React from "react";
 import { OrderBook } from "../types";
 import Asks from "./Asks";
 import Bids from "./Bids";
-import Book from "./Book";
 import Button from "./Button";
 import FooterBar from "./FooterBar";
 import HeaderBar from "./HeaderBar";
+import { Default, Mobile } from "./Responsive";
+import Spread from "./Spread";
 import { OrderBookContainer, OrderBookWrapper } from "./styles";
 
 interface Props {
@@ -40,20 +41,36 @@ export default function Orderbook({
         bidsLowestPrice={data.bidsLowestPrice}
       />
       <OrderBookWrapper>
-        {/* <Book data={data}> */}
-        <Bids
-          bids={data.bids}
-          decimalPlace={decimalPlace}
-          bidsTotal={data.bidsTotal}
-        />
-        {/* </Book> */}
-        {/* <Book data={data}> */}
-        <Asks
-          asks={data.asks}
-          decimalPlace={decimalPlace}
-          asksTotal={data.asksTotal}
-        />
-        {/* </Book> */}
+        <Default>
+          <Bids
+            bids={data.bids}
+            decimalPlace={decimalPlace}
+            bidsTotal={data.bidsTotal}
+          />
+          <Asks
+            asks={data.asks}
+            decimalPlace={decimalPlace}
+            asksTotal={data.asksTotal}
+          />
+        </Default>
+        <Mobile>
+          <Asks
+            asks={data.asks}
+            decimalPlace={decimalPlace}
+            asksTotal={data.asksTotal}
+          />
+          <Mobile>
+            <Spread
+              asksLowestPrice={data.asksLowestPrice}
+              bidsLowestPrice={data.bidsLowestPrice}
+            />
+          </Mobile>
+          <Bids
+            bids={data.bids}
+            decimalPlace={decimalPlace}
+            bidsTotal={data.bidsTotal}
+          />
+        </Mobile>
       </OrderBookWrapper>
       <FooterBar handleToggle={handleToggle} handleKill={handleKill} />
     </OrderBookContainer>
